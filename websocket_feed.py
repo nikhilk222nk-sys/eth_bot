@@ -13,15 +13,39 @@ class BinanceWebSocket:
 
     def on_message(self, ws, message):
 
-        data = json.loads(message)
+        try:
 
-        if 'data' in data:
+            data = json.loads(message)
+
+            # Ignore non-dict messages
+            if not isinstance(data, dict):
+                return
+
+            # Ignore messages without market data
+            if 'data' not in data:
+                return
 
             ticker = data['data']
 
-            self.price = float(ticker['price'])
-            self.bid = float(ticker['bestBid'])
-            self.ask = float(ticker['bestAsk'])
+            # Ignore if ticker is not dict
+            if not isinstance(ticker, dict):
+                return
+
+            self.price = float(
+                ticker.get('price', 0)
+            )
+
+            self.bid = float(
+                ticker.get('bestBid', 0)
+            )
+
+            self.ask = float(
+                ticker.get('bestAsk', 0)
+            )
+
+        except Exception as e:
+
+            print(f"WebSocket Error: {e}")
 
     def on_error(self, ws, error):
 
@@ -47,7 +71,7 @@ class BinanceWebSocket:
 
     def start(self):
 
-        websocket_url = "wss://ws-api-spot.kucoin.com/"
+        websocket_url = "wss://ws-api-spot.kucoin.com"
 
         ws = websocket.WebSocketApp(
             websocket_url,
@@ -62,4 +86,5 @@ class BinanceWebSocket:
         )
 
         thread.daemon = True
+
         thread.start()

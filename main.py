@@ -1,9 +1,6 @@
 import time
 import ccxt
 import pandas as pd
-import threading
-
-from websocket_feed import BinanceWebSocket
 
 from indicators import add_indicators
 from orderflow import OrderFlowAnalyzer
@@ -18,8 +15,7 @@ from ml_model import MLModel
 from telegram_alerts import TelegramAlerts
 
 
-# KUCOIN EXCHANGE
-exchange = ccxt.kucoin({
+exchange = ccxt.bybit({
     'enableRateLimit': True
 })
 
@@ -30,20 +26,18 @@ btc = BTCFilter()
 multi = MultiTF()
 ml = MLModel()
 
-# START WEBSOCKET
-ws_feed = BinanceWebSocket()
-
-threading.Thread(
-    target=ws_feed.start,
-    daemon=True
-).start()
-
-# KUCOIN SYMBOL
-symbol = "ETH/USDT:USDT"
+symbol = "ETH/USDT"
 
 while True:
 
     try:
+
+        # LIVE TICKER
+        ticker = exchange.fetch_ticker(symbol)
+
+        live_price = ticker['last']
+        bid_price = ticker['bid']
+        ask_price = ticker['ask']
 
         # FETCH CANDLES
         ohlcv = exchange.fetch_ohlcv(
@@ -152,11 +146,11 @@ while True:
         # TERMINAL OUTPUT
         print("--------------------------------")
 
-        print(f"LIVE PRICE: {ws_feed.price}")
+        print(f"LIVE PRICE: {live_price}")
 
-        print(f"BID: {ws_feed.bid}")
+        print(f"BID: {bid_price}")
 
-        print(f"ASK: {ws_feed.ask}")
+        print(f"ASK: {ask_price}")
 
         print(f"CANDLE PRICE: {row['close']}")
 
@@ -197,11 +191,11 @@ while True:
 
 SIGNAL: {signal}
 
-LIVE PRICE: {ws_feed.price}
+LIVE PRICE: {live_price}
 
-BID: {ws_feed.bid}
+BID: {bid_price}
 
-ASK: {ws_feed.ask}
+ASK: {ask_price}
 
 RSI: {row['rsi']:.2f}
 
