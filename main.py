@@ -18,7 +18,9 @@ from ml_model import MLModel
 from telegram_alerts import TelegramAlerts
 
 
-exchange = ccxt.binance()
+exchange = ccxt.bybit({
+    'enableRateLimit': True
+})
 
 strategy = Strategy()
 risk = RiskManager()
