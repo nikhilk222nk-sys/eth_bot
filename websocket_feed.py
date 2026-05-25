@@ -7,33 +7,21 @@ class BinanceWebSocket:
 
     def __init__(self):
 
-        self.price = None
-        self.bid = None
-        self.ask = None
+        self.price = 0
+        self.bid = 0
+        self.ask = 0
 
     def on_message(self, ws, message):
 
-        try:
+        data = json.loads(message)
 
-            data = json.loads(message)
+        if 'data' in data:
 
-            if 'data' in data:
+            ticker = data['data']
 
-                ticker = data['data']
-
-                self.price = float(
-                    ticker.get('lastPrice', 0)
-                )
-
-                bid = ticker.get('bid1Price')
-                ask = ticker.get('ask1Price')
-
-                self.bid = float(bid) if bid else 0
-                self.ask = float(ask) if ask else 0
-
-        except Exception as e:
-
-            print(f"WebSocket Error: {e}")
+            self.price = float(ticker['price'])
+            self.bid = float(ticker['bestBid'])
+            self.ask = float(ticker['bestAsk'])
 
     def on_error(self, ws, error):
 
@@ -45,18 +33,21 @@ class BinanceWebSocket:
 
     def on_open(self, ws):
 
-        print("Bybit WebSocket Connected")
+        print("KuCoin WebSocket Connected")
 
         subscribe_message = {
-            "op": "subscribe",
-            "args": ["tickers.ETHUSDT"]
+            "id": "1",
+            "type": "subscribe",
+            "topic": "/market/ticker:ETH-USDT",
+            "privateChannel": False,
+            "response": True
         }
 
         ws.send(json.dumps(subscribe_message))
 
     def start(self):
 
-        websocket_url = "wss://stream.bybit.com/v5/public/spot"
+        websocket_url = "wss://ws-api-spot.kucoin.com/"
 
         ws = websocket.WebSocketApp(
             websocket_url,

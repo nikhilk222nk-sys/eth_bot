@@ -18,7 +18,8 @@ from ml_model import MLModel
 from telegram_alerts import TelegramAlerts
 
 
-exchange = ccxt.bybit({
+# KUCOIN EXCHANGE
+exchange = ccxt.kucoin({
     'enableRateLimit': True
 })
 
@@ -29,7 +30,7 @@ btc = BTCFilter()
 multi = MultiTF()
 ml = MLModel()
 
-# START REAL BINANCE WEBSOCKET
+# START WEBSOCKET
 ws_feed = BinanceWebSocket()
 
 threading.Thread(
@@ -37,7 +38,8 @@ threading.Thread(
     daemon=True
 ).start()
 
-symbol = "ETH/USDT"
+# KUCOIN SYMBOL
+symbol = "ETH/USDT:USDT"
 
 while True:
 
