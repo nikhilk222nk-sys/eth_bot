@@ -13,9 +13,11 @@ from multi_tf import MultiTF
 from ml_model import MLModel
 
 from telegram_alerts import TelegramAlerts
+from logger import TradeLogger
 
 
-exchange = ccxt.bybit({
+# KUCOIN EXCHANGE
+exchange = ccxt.kucoin({
     'enableRateLimit': True
 })
 
@@ -184,6 +186,18 @@ while True:
             print(f"STOP LOSS: {stop}")
 
             print(f"TAKE PROFIT: {take}")
+
+            # LOG SIGNAL
+            TradeLogger.log_signal(
+                signal,
+                live_price,
+                confidence,
+                imbalance,
+                delta,
+                btc_trend,
+                higher_tf,
+                sweep
+            )
 
             # TELEGRAM ALERT
             message = f'''
